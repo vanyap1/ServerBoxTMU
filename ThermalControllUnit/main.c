@@ -53,6 +53,13 @@ rtc_date sys_rtc = {
 	.second = 00
 };	
 	
+/*
+Next - 
+ADC configuration					<< DONE
+ADC value to Temperature			<< DONE
+PWM
+FAN control logic (Perhaps - PID)
+*/
 	
 int main(void)
 {
@@ -87,7 +94,7 @@ int main(void)
 		
 		
 		rtc_sync(&sys_rtc);
-		printf("Time: %02d-%02d-20%02d; %02d:%02d:%02d\r\n", sys_rtc.date, sys_rtc.month, sys_rtc.year, sys_rtc.hour, sys_rtc.minute, sys_rtc.second);
+		printf("Time: %02d-%02d-20%02d; %02d:%02d:%02d; NTC: %03d\r\n", sys_rtc.date, sys_rtc.month, sys_rtc.year, sys_rtc.hour, sys_rtc.minute, sys_rtc.second, getNTC(NTC2));
 		
     }
 }

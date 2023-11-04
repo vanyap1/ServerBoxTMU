@@ -7,14 +7,19 @@
 #include "adc_hal.h"
 
 volatile static uint8_t adc_convert_done = 1;
+const float R1 = 10000.0;  
+const float Vcc = 3.3;     
+const int ADCResolution = 1024;
+
+
 
 ISR(ADC_vect){
 	adc_convert_done = 1;
 }
 
 void adc_init(void){
-	ADMUX |= REFS_1_1V << REFS0 | 1 << REFS1;
-	ADCSRA |= 1 << ADEN | 1 << ADIE | 0b111 << ADPS0;
+	ADMUX |= (AVCC << REFS0);
+	ADCSRA |= (1 << ADEN) | (1 << ADIE) | (0b111 << ADPS0);
 }
 
 
@@ -62,3 +67,22 @@ uint16_t get_mVolt(uint8_t source){
 	return ADC_VOLT(adc_convert());
 }
 
+int16_t getNTC(uint8_t thermalZone){
+	return ADCtoCelsius(get_adc(thermalZone));
+}
+
+int16_t ADCtoCelsius(uint16_t adcValue) {
+	//int16_t retval = 0;
+	//float ntc_sample = adcValue;
+	//if (ntc_sample > 697) {
+		//retval = (int16_t)(((-0.0295 * ntc_sample) + 40.5)*10);
+		//} if (ntc_sample > 420) {
+		//retval = (int16_t)(((-0.0474 * ntc_sample) + 53.3)*10);
+		//} else {
+		//retval = (int16_t)(((-0.0777 * ntc_sample) + 65.1)*10);
+	//}
+	//return retval;
+	float R2 = R1 / ((ADCResolution - adcValue) / (float)adcValue);
+	float temp = 1.0 / ((log(R2 / R1) / 3950.0) + (1.0 / 298.15)) - 273.15;
+	return (int16_t)(temp * 10);
+}
